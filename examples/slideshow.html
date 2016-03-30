@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Demo content</title>
+    <style>
+      body {
+        background-color:#eaeaea;
+        color:#454545;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+     </style>
+     
+     <script src="../content.js"></script>
+     
+  </head>
+  <body>
+    <div id="slideshow-example">
+      <h1>Example of a slideshow module</h1>
+      
+    </div>
+    <script>
+      
+      // Wrapper view
+      Content.on('render', 'slideshow-example', function(id) {
+        
+        this.onKeypress = function(event) {
+          switch(event.keyCode) {
+            case 13:
+              console.log('Open full view of image');
+              break;
+            case 39:
+              console.log('Move to next');
+              break;
+            case 37:
+              console.log('Move to previous');
+              break;
+            default:
+              console.log(event.keyCode);
+          } 
+        }
+        
+        // Global listener for keydown event
+        Content.pipe('keydown', id, this.onKeypress);
+        
+        // Content.registerEvents(id, {
+        //   "enter": function() {console.log(id)},
+        //   "keydown": "onKeypress"
+        // });
+      })
+    </script>
+  </body>
+</html>

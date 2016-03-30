@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Demo content</title>
+    <style>
+      body {
+        background-color:#eaeaea;
+        color:#454545;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+     </style>
+     
+     <script src="../content.js"></script>
+     
+  </head>
+  <body>
+    <div id="basic">
+      <h1>Basic Example using ContentJS</h1>
+      <p>The minimum code to add some interactivity.</p>
+      <p><button>Click me</button></p>
+    </div>
+    <script>
+        // Called like this, the element need to have been rendered first
+        // Otherwise it should be included in a "render" listener, e.g.:
+        // Content.on('render', 'basic', function(id) {
+        Content.registerEvents("basic", {
+          "click button": function(event) {
+            event.target.parentNode.innerHTML = "It worked!";
+          }
+        });
+        // });
+        Content.on('enter', 'basic', function(event) {
+          console.log('It works!');
+        })
+    </script>
+  </body>
+</html>

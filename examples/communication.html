@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Demo content</title>
+    <style>
+      body {
+        background-color:#eaeaea;
+        color:#454545;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      #communication-example {
+        opacity: 0;
+        transition:opacity 1s;
+      }
+      #communication-example.active {
+        opacity: 1;
+      }
+     </style>
+     
+     <script src="../content.js"></script>
+     
+  </head>
+  <body>
+    <div id="communication-example">
+      <h1>Example showing communication in ContentJS</h1>
+      <p>Two views sending and receiving messages.</p>
+      <p><label for="message">Message:</label> <input type="text" id="message" name="message"></p>
+      <p>You said: <span id="display"></span></p>
+      <p><button id="reset">Reset</button></p>
+    </div>
+    <script>
+      // Alternative bare-bones JS:
+      // (function () {
+      //   var input = document.getElementById('message');
+      //   var display = document.getElementById('display');
+      //   var resetBtn = document.getElementById('reset'); 
+        
+      //   input.addEventListener('input', function(event) {
+      //     if (display) display.innerHTML = input.value;
+      //   });
+        
+      //   resetBtn.addEventListener('click', function(event) {
+      //     if (input) input.value = "";
+      //     if (display) display.innerHTML = "";
+      //   })
+        
+      // }());
+      
+      const EVENTS = {
+        'clear': 'clear:msg',
+        'new': 'new:msg'
+      };
+      
+      // Wrapper view
+      Content.on('render', 'communication-example', function(id) {
+        console.log('Example rendered');
+        Content.on('enter', id, function(event) {
+          this.el.classList.add('active');
+          // Will receive events from sub-views
+          console.log('Entered', event.target.id);
+        });
+        Content.on('exit', id, function(event) {
+          this.el.classList.remove('active');
+          // Will receive events from sub-views
+          console.log('Exited', event.target.id);
+        });
+      })
+          
+      Content.on('render', 'message', function(id) {
+        Content
+          .registerEvents(id, {
+            "enter": function(event) {
+              this.el.placeholder = "Type your message";
+              this.el.focus();
+            },
+            "input": function(event) {
+              Content.send(EVENTS['new'], {msg: this.el.value});
+            },
+            "clear": function(event) {
+              this.el.value = "";
+              Content.send(EVENTS['new'], {msg: this.el.value});
+            },
+            "keypress": function(event) {
+              if (event.charCode === 13) {
+                Content.send(EVENTS.clear);
+              }
+            }
+          })
+          .pipe(EVENTS['clear'], id, function(event) {
+            this.el.value = "";
+            // Content.send('new:msg', {msg: this.el.value});
+          })
+      });
+      
+      Content.on('render', 'display', function(id) {       
+          Content
+            // Pipe global events to views
+            .pipe(EVENTS['new'], id, function(event) {
+              this.el.innerHTML = event.msg;
+            })
+            .pipe(EVENTS['clear'], id, function(event) {
+              this.el.innerHTML = "";
+            })
+      });
+      
+      Content.on('render', 'reset', function(id) {
+        Content
+          .registerEvents(id, {
+            "click": function(event) {
+              Content.send(EVENTS['clear']);
+            }
+          })
+      })
+    </script>
+  </body>
+</html>
